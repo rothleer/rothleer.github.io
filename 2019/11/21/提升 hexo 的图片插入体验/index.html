@@ -8,7 +8,7 @@
   
   
   
-  <title>测试文章 | Hexo</title>
+  <title>提升 hexo 的图片插入体验 | Hexo</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -221,7 +221,7 @@
 
 <div class="post">
   <h1 class="article-title">
-    <span>测试文章</span>
+    <span>提升 hexo 的图片插入体验</span>
   </h1>
   <div class="article-top-meta">
     <span>
@@ -231,7 +231,7 @@
     
     
       <span>
-        浏览 : <span class="article-timer" data-identity="测试文章"></span>
+        浏览 : <span class="article-timer" data-identity="提升 hexo 的图片插入体验"></span>
       </span>
     
   </div>
@@ -240,12 +240,31 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <h1 id="测试文章"><a href="#测试文章" class="headerlink" title="测试文章"></a>测试文章</h1><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>这是一篇测试文章，用来测试 hexo 是否能正常的工作。</p>
-<h2 id="代码块测试"><a href="#代码块测试" class="headerlink" title="代码块测试"></a>代码块测试</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">"cstdio"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">"cstring"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      <h1 id="提升-hexo-的图片插入体验"><a href="#提升-hexo-的图片插入体验" class="headerlink" title="提升 hexo 的图片插入体验"></a>提升 hexo 的图片插入体验</h1><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>对于使用 Typora 的小伙伴，按照本文的指南，可以保持本地插入图片，无需为发布再修改 Markdown 文档。保持了本地和云端有除了 CSS 上一致的效果。</p>
+<ul>
+<li><p>使用 <code>hexo clean</code> 命令清除缓存。</p>
+</li>
+<li><p>复制下面代码段的代码到根目录下的 <code>scripts</code> 文件夹中。</p>
+</li>
+<li><p>修改 Typora 的插入图片规则为<code>./images/</code>。</p>
+</li>
+<li><p>设置 <code>/source/_posts/images</code> 软链到 <code>/source/images/</code></p>
+</li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>个人搭建博客网站是十分麻烦的，从前甚至从购买服务器开始。hexo 和 github pages 的出现解决了这个问题。使得个人零成本，方便的建站。Markdown 的出现使得人们可以简单编写具有优良结构文章。而不必编写繁琐的 HTML。Typora 是我正在使用所见即所得编辑 markdown 文章的软件。一方面，在 Typora 插入的本地图片，需要经过修改链接。才能发布到博客中。另一方面，修改图片链接就让本地无法预览，让本地写好的文章脱离了所见即所得。经过下面操作，保证了编写的文章和上传时无需修改图片的引用。</p>
+<h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><h3 id="清理缓存"><a href="#清理缓存" class="headerlink" title="清理缓存"></a>清理缓存</h3><p>hexo 默认不对已经生成过 HTML 的 Markdown 文章，再生成一次 HTML。所以需要清理缓存。复制好的代码会修改，生成的 HTML。所以需要清除缓存一次。</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br></pre></td></tr></table></figure>
 
-<h2 id="数学公式"><a href="#数学公式" class="headerlink" title="数学公式"></a>数学公式</h2><p>使用爆发公式举例：<br>$$<br>B = (\sigma-m)/(\sigma+m)<br>$$</p>
-<h2 id="图片测试"><a href="#图片测试" class="headerlink" title="图片测试"></a>图片测试</h2><p><img src="/images/image-20191121122149077.png" alt="测试图片，知乎登录"></p>
+<h3 id="复制代码"><a href="#复制代码" class="headerlink" title="复制代码"></a>复制代码</h3><p>复制下面代码段的代码到根目录下的 <code>scripts</code> 文件夹中新建 js 文件中新建的 js 命名任意。这段代码来自 <strong>hexo-asset-image</strong> 插件，我个人修改一部分。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">'use strict'</span>;</span><br><span class="line"><span class="keyword">var</span> cheerio = <span class="built_in">require</span>(<span class="string">'cheerio'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// http://stackoverflow.com/questions/14480345/how-to-get-the-nth-occurrence-in-a-string</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getPosition</span>(<span class="params">str, m, i</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> str.split(m, i).join(m).length;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">hexo.extend.filter.register(<span class="string">'after_post_render'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">data</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> config = hexo.config;</span><br><span class="line">  <span class="keyword">if</span>(config.post_asset_folder)&#123;</span><br><span class="line">    <span class="keyword">var</span> link = data.permalink;</span><br><span class="line">    <span class="keyword">var</span> beginPos = getPosition(link, <span class="string">'/'</span>, <span class="number">3</span>) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">var</span> appendLink = <span class="string">''</span>;</span><br><span class="line">    <span class="comment">// In hexo 3.1.1, the permalink of "about" page is like ".../about/index.html".</span></span><br><span class="line">    <span class="comment">// if not with index.html endpos = link.lastIndexOf('.') + 1 support hexo-abbrlink</span></span><br><span class="line">    <span class="keyword">if</span>(<span class="regexp">/.*\/index\.html$/</span>.test(link)) &#123;</span><br><span class="line">      <span class="comment">// when permalink is end with index.html, for example 2019/02/20/xxtitle/index.html</span></span><br><span class="line">      <span class="comment">// image in xxtitle/ will go to xxtitle/index/</span></span><br><span class="line">      appendLink = <span class="string">'index/'</span>;</span><br><span class="line">      <span class="keyword">var</span> endPos = link.lastIndexOf(<span class="string">'/'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">var</span> endPos = link.lastIndexOf(<span class="string">'.'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    link = link.substring(beginPos, endPos) + <span class="string">'/'</span> + appendLink;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> toprocess = [<span class="string">'excerpt'</span>, <span class="string">'more'</span>, <span class="string">'content'</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; toprocess.length; i++)&#123;</span><br><span class="line">      <span class="keyword">var</span> key = toprocess[i];</span><br><span class="line"></span><br><span class="line">      <span class="keyword">var</span> $ = cheerio.load(data[key], &#123;</span><br><span class="line">        ignoreWhitespace: <span class="literal">false</span>,</span><br><span class="line">        xmlMode: <span class="literal">false</span>,</span><br><span class="line">        lowerCaseTags: <span class="literal">false</span>,</span><br><span class="line">        decodeEntities: <span class="literal">false</span></span><br><span class="line">      &#125;);</span><br><span class="line"></span><br><span class="line">      $(<span class="string">'img'</span>).each(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span> ($(<span class="keyword">this</span>).attr(<span class="string">'src'</span>))&#123;</span><br><span class="line">          <span class="comment">// For windows style path, we replace '\' to '/'.</span></span><br><span class="line">          <span class="keyword">var</span> src = $(<span class="keyword">this</span>).attr(<span class="string">'src'</span>).replace(<span class="string">'\\'</span>, <span class="string">'/'</span>);</span><br><span class="line">          <span class="built_in">console</span>.log(src.slice(<span class="number">0</span>,<span class="number">7</span>));</span><br><span class="line">          <span class="keyword">if</span>(src.slice(<span class="number">0</span>,<span class="number">7</span>) === <span class="string">'images/'</span>)&#123;</span><br><span class="line">              $(<span class="keyword">this</span>).attr(<span class="string">'src'</span>,<span class="string">'/'</span>+src)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">          <span class="built_in">console</span>.info&amp;&amp;<span class="built_in">console</span>.info(<span class="string">"no src attr, skipped..."</span>);</span><br><span class="line">          <span class="built_in">console</span>.info&amp;&amp;<span class="built_in">console</span>.info($(<span class="keyword">this</span>));</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">      data[key] = $.html();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
+<h3 id="修改-Typora-的插入图片规则"><a href="#修改-Typora-的插入图片规则" class="headerlink" title="修改 Typora 的插入图片规则"></a>修改 Typora 的插入图片规则</h3><p>在 偏好设置-&gt;图片-&gt;复制到指定路径。修改 Typora 的插入图片规则为<code>./images/</code>。</p>
+<h3 id="软链接"><a href="#软链接" class="headerlink" title="软链接"></a>软链接</h3><p>设置 <code>/source/_posts/images</code> 软链到 <code>/source/images/</code>。</p>
+<h2 id="原理和方法"><a href="#原理和方法" class="headerlink" title="原理和方法"></a>原理和方法</h2><p>yanyinhong 的文章 [^1] 中提到了三种插入图片的方式，这三种不论是哪一种，都无法在本地实时预览，都需要在上传前修改本地图片的链接。第一种方法，把图片放入到<code>/source/images</code>文件夹中，可以在首页和文章观看。第二种，不能在首页中出现。第三种是 hexo 的插件语法。个人看法，这样的插件语法比较丑陋。</p>
+<p>在 Typora 中插入本地图片若使用复制到相对路径，<code>./images/</code> 那么生成的图片会被复制到同目录下的 images 文件夹中。并且同时生成相对路径的图片引用：<code>![说明](images/image-日期+随机数)</code>。在被编译后的 HTML 中，会变为<code>&lt;img src=&quot;images/image-日期+随机数&quot;&gt;</code> 而如果想要访问<code>/source/images</code> 中的图片需要把链接转化为 <code>&lt;img src=&quot;/images/image-日期+随机数&quot;&gt;</code> 上述代码实现了修改 img 链接的功能。同时让 <code>/source/_posts/images</code> 软链到 <code>/source/images/</code>。让这两个文件夹变为不同地址的，但包含内容相同的文件夹。每次复制到，<code>/source/_posts/images</code>，就会同步到<code>/source/images/</code>。网页上的图片链接引用自<code>/source/images/</code>。</p>
+<p>实际上，可以将代码的44-45行修改。再将 Typora 改为直接复制到<code>/source/images</code> 中，无需软链。代码很简单就不列在这里了。笔者个人比较喜欢保持图片和文章在同一个目录下，所以不推荐这种方式。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>尽管操作步骤很多，对于新手也很容易出错。但是设置完成之后只需要按照平常的使用方法使用 typora 就可以了。有点磨刀不误砍柴工的感觉。 <strong>hexo-asset-image</strong> 这个插件我在  <a href="http://etrd.org/" target="_blank" rel="noopener">ETRD</a> 中的博客看到的。[^2] 我并没有学习过 hexo 的脚本或者插件开发，所以修改的代码可能有 BUG。也请在评论区中告诉我。预览效果请参考  <a href="https://rothleer.github.io/2019/11/21/测试文章/">https://rothleer.github.io/2019/11/21/%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0/</a>  </p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2>
     </div>
   </div>
   
@@ -256,7 +275,7 @@
         
           本文作者 : Rothleer <br/>
         
-        原文链接 : <a href="">https://rothleer.github.io/2019/11/21/%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0/</a><br>
+        原文链接 : <a href="">https://rothleer.github.io/2019/11/21/%E6%8F%90%E5%8D%87%20hexo%20%E7%9A%84%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5%E4%BD%93%E9%AA%8C/</a><br>
         版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
         </blockquote>
       </div>
@@ -336,12 +355,12 @@
 
   <nav class="post-navigation">
     
-    
-      <div class="nav-next">
-        下一篇:
-        <a href="/2019/11/21/%E6%8F%90%E5%8D%87%20hexo%20%E7%9A%84%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5%E4%BD%93%E9%AA%8C/" target="_self">提升 hexo 的图片插入体验</a>
-        <i class="iconfont icon-next"></i>
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/11/21/%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0/" target="_self">测试文章</a>
       </div>
+    
     
   </nav>
 
