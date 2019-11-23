@@ -263,7 +263,6 @@
 <h2 id="原理和方法"><a href="#原理和方法" class="headerlink" title="原理和方法"></a>原理和方法</h2><p>yanyinhong 的文章 <a href="https://yanyinhong.github.io/2017/05/02/How-to-insert-image-in-hexo-post/" target="_blank" rel="noopener" title="yanyinhong 的博客：Hexo博客搭建之在文章中插入图片">^1</a> 中提到了三种插入图片的方式，这三种不论是哪一种，都无法在本地实时预览，都需要在上传前修改本地图片的链接。第一种方法，把图片放入到<code>/source/images</code>文件夹中，并用<code>/images/image name</code>引用，可以在首页和文章观看。第二种方法，图片可以在文章出现，但不能在首页中出现。第三种方法，是 hexo 的插件语法。个人看法，这样的插件语法比较丑陋。</p>
 <p>上面提到的第一种方法，应用场景最全面。要让插入到图片保存到<code>/source/images/</code>中，可以将 Typora 的保存图片规则设置为插入到<code>../images/</code>，然后解决第二问题，规则为<code>../images</code> 生成的 img 的 src 属性也是<code>../images</code> ，而我们需要的是<code>/images/image name</code>的形式，使用脚本修改生成标签的属性，将上文的 44-45行修改如下。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(src.slice(<span class="number">0</span>,<span class="number">8</span>) === <span class="string">'../images'</span>)&#123;</span><br><span class="line">              $(<span class="keyword">this</span>).attr(<span class="string">'src'</span>,src.slice(<span class="number">2</span>))</span><br></pre></td></tr></table></figure>
-
 <p>将上述操作完成后，已经可以实现本地云端图片一致的体验了。但是，我认为 Typora 将图片默认保存到上级目录，这样的行为是很奇怪的。所以修改了本来提示的代码，使用软链接的方式把当前目录的<code>images</code>链接到上级目录的<code>images</code>。再修改初入规则默认插入到和文件的同名目录下的images。再改回上面脚本的形式。就完成本文说的，</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>尽管操作步骤很多，对于新手也很容易出错。但是设置完成之后只需要按照平常的使用方法使用 typora 就可以了。有点磨刀不误砍柴工的感觉。 <strong>hexo-asset-image</strong> 这个插件我在  <a href="http://etrd.org/" target="_blank" rel="noopener">ETRD</a> 中的博客看到的<a href="http://etrd.org/2017/01/23/hexo%E4%B8%AD%E5%AE%8C%E7%BE%8E%E6%8F%92%E5%85%A5%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87/" target="_blank" rel="noopener" title="ETRD的博客：hexo中完美插入本地图片">^2</a>。 我并没有学习过 hexo 的脚本或者插件开发，所以修改的代码可能有 BUG。也请在评论区中告诉我。预览效果请参考:<br><a href="https://rothleer.github.io/2019/11/21/测试文章/">https://rothleer.github.io/2019/11/21/%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0/</a> </p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2>
@@ -363,6 +362,12 @@
         <a href="/2019/11/21/%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0/" target="_self">测试文章</a>
       </div>
     
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2019/11/23/Android%20%E4%B8%8A%E7%9A%84%20Chrome%EF%BC%9AKiwi%20%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E8%B0%83%E6%95%B4%E5%92%8C%E6%8F%92%E4%BB%B6%E5%88%86%E4%BA%AB/" target="_self">Android 上的 Chrome：Kiwi 浏览器的调整和插件分享</a>
+        <i class="iconfont icon-next"></i>
+      </div>
     
   </nav>
 
