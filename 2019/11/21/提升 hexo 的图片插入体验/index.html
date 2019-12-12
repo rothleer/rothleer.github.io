@@ -4,7 +4,7 @@
   
 <head>
   <meta charset="utf-8">
-  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com" />
+  <meta name="author" content="Rothleer" />
   
   
   
@@ -41,9 +41,6 @@
   
 
   
-    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
-  
 
   
     <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
@@ -51,8 +48,6 @@
   
   <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
   
-  
-    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
   
 
 </head>
@@ -67,7 +62,7 @@
   <header>
     <div class="site-brand">
       <div class="site-title">
-        <a href="/">GODBMW.com</a>
+        <a href="/">Rothleer Blog</a>
       </div>
     </div>
     <nav class="site-navigation">
@@ -146,7 +141,7 @@
               
                 <li>
                   <a 
-                    href="https://github.com/dongyuanxin" 
+                    href="https://github.com/rothleer" 
                     target="_blank"
                   >
                     Github
@@ -155,7 +150,7 @@
               
                 <li>
                   <a 
-                    href="https://www.zhihu.com/people/godbmw/activities" 
+                    href="https://www.zhihu.com/people/rothleer" 
                     target="_blank"
                   >
                     知乎
@@ -230,10 +225,6 @@
     </span>
     
     
-      <span>
-        浏览 : <span class="article-timer" data-identity="提升 hexo 的图片插入体验"></span>
-      </span>
-    
   </div>
 
   
@@ -251,7 +242,7 @@
 <li><p>设置 <code>/source/_posts/images</code> 软链到 <code>/source/images/</code></p>
 </li>
 </ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>个人搭建博客网站是十分麻烦的，从前甚至从购买服务器安装操作系统开始，其中要碰到的麻烦不言而喻。hexo 和 github pages 的出现解决了这个问题。使得个人零成本，方便的建站。Markdown 的出现使得人们可以低成本的编写具有优良结构文章。而不必编写繁琐的 HTML。本文使用 Typora 作为例子，它是一款优秀的 markdown 编辑器。此外有名的 markdown 编辑器还有 Vnote，Marktext 等等。使用这些编辑器在插入本地图片时候，会按照用户给定的方式生成地址。但是这样生成的地址是难以在 hexo 中直接发布的，需要进行一定的修改，那么问题就来了。修改后的地址 markdown 编辑器中不显示图片，不方便后期修改。并且，每次发布都要修改是十分麻烦的，为了解决这个问题，提出了一下操作方法。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>个人搭建博客网站是十分麻烦的，从前甚至从购买服务器安装操作系统开始，其中要碰到的麻烦不言而喻。hexo 和 github pages 的出现解决了这个问题。使得个人零成本，方便的建站。Markdown 的出现使得人们可以低成本的编写具有优良结构文章。而不必编写繁琐的 HTML。本文使用 Typora 作为例子，它是一款优秀的 markdown 编辑器。此外有名的 markdown 编辑器还有 Vnote，Marktext 等等。使用这些编辑器在插入本地图片时候，会按照用户给定的方式生成地址。但是这样生成的地址是难以在 hexo 中直接发布的，需要进行一定的修改，那么问题就来了。修改后的地址 markdown 编辑器中不显示图片，不方便后期修改。并且，每次发布都要修改是十分麻烦的，为了解决这个问题，提出了以下操作方法。</p>
 <h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><h3 id="清理缓存"><a href="#清理缓存" class="headerlink" title="清理缓存"></a>清理缓存</h3><p>hexo 默认不对已经生成过 HTML 的 Markdown 文章，再生成一次 HTML。所以需要清理缓存。复制好的代码会修改，生成的 HTML。所以需要清除缓存一次。</p>
 <figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br></pre></td></tr></table></figure>
 
@@ -297,43 +288,6 @@
   
 
   
-    <div id="reward">
-  
-    <p id="reward-meta">知识 & 情怀 | 二者兼得</p>
-  
-  <button id="reward-btn">
-    
-    <span>投食</span>
-  </button>
-  <div id="reward-qrcode">
-    
-      <div class="reward-qrcode--container">
-        <img class="qrcode-img" src="/images/wechat.png" alt="微信扫一扫, 向我投食">
-        <p class="qrcode-meta">微信扫一扫, 向我投食</p>
-      </div>
-    
-      <div class="reward-qrcode--container">
-        <img class="qrcode-img" src="/images/alipay.png" alt="支付宝扫一扫, 向我投食">
-        <p class="qrcode-meta">支付宝扫一扫, 向我投食</p>
-      </div>
-    
-  </div>
-
-</div>
-
-<script>
-  (() => {
-    let button = document.querySelector('#reward-btn'),
-      qrcode = document.querySelector('#reward-qrcode'),
-      display = false;
-    
-    button.addEventListener('click', () => {
-      qrcode.style.display = display ? 'none' : 'block'
-      display = !display
-    }, false)
-  })()
-</script>
-  
 
   <div class="article-footer">
     <div class="article-meta pull-left">
@@ -371,155 +325,8 @@
     
   </nav>
 
-  
-    <a href="#comment" class="comment-anchor"></a>
-<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
-<div id="vcomments"></div>
-
-<script defer>
-  if( true ) {
-    let path = getRealPath()
-    new Valine({
-      el: "#vcomments",
-      appId: "Hyq9wkH495DgNHWhDQCOfQSp-gzGzoHsz",
-      appKey: "WaR7nrzhliHj9aVwdQzkdlGd",
-      notify: false,
-      verify: false,
-      avatar: "robohash",
-      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
-      path
-    });
-  }
-</script>
    
 
-  
-    <script defer>
-const valineAPI = (() => {
-  try {
-    AV.init("Hyq9wkH495DgNHWhDQCOfQSp-gzGzoHsz", "WaR7nrzhliHj9aVwdQzkdlGd");
-  } catch(error) {}
-  const isExist = (identity) => {
-    identity = identity || getRealPath();
-    let query = new AV.Query('Timer');
-    return new Promise((resolve, reject) => {
-      query.equalTo("identity", identity);
-      query.find().then(results => {
-        resolve(results.length > 0);
-      }, error => reject(error));
-    })
-  }
-
-  const _get = (identity) => {
-    let query = null;
-    if(identity && identity instanceof Array){
-      let querys = [];
-      for(let i = 0; i < identity.length; ++i) {
-        querys[i] = new AV.Query('Timer');
-        querys[i].equalTo('identity', identity[i]);
-      }
-      query = AV.Query.or.apply(null ,querys);
-    } else {
-      identity = identity || getRealPath();
-      query = new AV.Query("Timer");
-      query.equalTo("identity", identity);
-    }
-
-    return new Promise((resolve, reject) => {
-      query.find()
-      .then(results => resolve(results))
-      .catch(error => reject(error))
-    })
-  }
-
-  const create = (identity) => {
-    identity = identity || getRealPath();
-    return new Promise((resolve, reject) => {
-      let Todo = AV.Object.extend('Timer');
-      let todo = new Todo();
-      todo.set("times", 1);
-      todo.set("identity", identity);
-      todo.save().then(res => resolve(true), error => reject(error));
-    })
-  }
-
-  const update = (identity) => {
-    identity = identity || getRealPath();
-    return new Promise((resolve, reject) => {
-      let query = new AV.Query('Timer');
-      query.equalTo("identity", identity);
-      query.find().then(todos => {
-        todos.forEach(todo => {
-          todo.set("times", todo.attributes.times + 1);
-        });
-        return AV.Object.saveAll(todos);
-      }).then(todos => resolve(true), error => reject(error));
-    })
-  }
-
-  return {
-    isExist,
-    _get,
-    update,
-    create
-  }
-})()
-
-const calcAndWriteTimes = () => {
-  let isPost = true;
-
-  let timerAllDOM = document.querySelectorAll(".article-timer");
-
-  if(isPost) {
-    let identity = timerAllDOM[0].getAttribute("data-identity");
-    valineAPI.isExist(identity)
-    .then(exist => {
-      if(exist) {
-        return valineAPI.update(identity);
-      }
-      return new Promise(resolve => resolve(true));
-    })
-    .then( succuess => valineAPI._get(identity))
-    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
-    .catch(error => console.log(error.message))
-    return ;
-  }
-
-  let timerDOMCache = {};
-
-  for(let timerDOM of timerAllDOM) {
-    let identity = timerDOM.getAttribute("data-identity");
-    if(timerDOMCache.hasOwnProperty(identity)){
-      timerDOMCache[identity].dom.push(timerDOM);
-    }else{
-      timerDOMCache[identity] = {
-        dom: [timerDOM],
-        times: undefined
-      };
-    }
-  }
-
-  let identities = Object.keys(timerDOMCache);
-  valineAPI._get(identities).then(results => {
-    for(let result of results) {
-      let {identity, times} = result.attributes;
-      timerDOMCache[identity].times = times;
-      timerDOMCache[identity].dom.map(item => item.innerText = times);
-    }
-    for(let identity of identities) {
-      if(timerDOMCache[identity].times){
-        continue;
-      }
-      timerDOMCache[identity].dom.map(item => item.innerText = 1);
-      valineAPI.create(identity);
-    }
-  }).catch(error => console.log(error.message))
-}
-
-if(true){
-  calcAndWriteTimes();
-}
-</script>
    
 
 </div>
