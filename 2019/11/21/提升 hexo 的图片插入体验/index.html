@@ -41,6 +41,9 @@
   
 
   
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
 
   
     <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
@@ -231,7 +234,7 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <h1 id="提升-hexo-的图片插入体验"><a href="#提升-hexo-的图片插入体验" class="headerlink" title="提升 hexo 的图片插入体验"></a>提升 hexo 的图片插入体验</h1><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>对于习惯使用本地 Markdown 编辑器编辑博客，用 hexo 发布的用户。在发布前需要修改本地图片的引用链接。一方面，修改链接增加了操作的步骤。另一方面，修改链接后不方便本地浏览。因此本文为了解决这个问题，以 Typora 作为例子，提出保持插入本地图片，无需为发布再修改本地图片引用链接操作方法。步骤如下：</p>
+      <h1 id="提升-hexo-的图片插入体验"><a href="#提升-hexo-的图片插入体验" class="headerlink" title="提升 hexo 的图片插入体验"></a>提升 hexo 的图片插入体验</h1><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>对于习惯使用本地 Markdown 编辑器编辑博客，用 hexo 发布的用户。会碰到一个麻烦的问题，在发布前需要修改本地图片的引用链接。这样的操作，一方面修改链接增加了操作的步骤。另一方面修改链接后不方便本地浏览。因此为了解决这个问题，本文以 Typora 作为例子，提出保持插入本地图片，无需为发布再修改本地图片引用链接操作方法。步骤如下：</p>
 <ul>
 <li><p>使用 <code>hexo clean</code> 命令清除缓存。</p>
 </li>
@@ -252,7 +255,7 @@
 <h3 id="修改-Typora-的插入图片规则"><a href="#修改-Typora-的插入图片规则" class="headerlink" title="修改 Typora 的插入图片规则"></a>修改 Typora 的插入图片规则</h3><p>在 偏好设置-&gt;图片-&gt;复制到指定路径。修改 Typora 的插入图片规则为<code>./images/</code>。</p>
 <h3 id="软链接"><a href="#软链接" class="headerlink" title="软链接"></a>软链接</h3><p>设置 <code>/source/_posts/images</code> 软链接到 <code>/source/images/</code>。</p>
 <h2 id="原理和方法"><a href="#原理和方法" class="headerlink" title="原理和方法"></a>原理和方法</h2><p>yanyinhong 的文章 <a href="https://yanyinhong.github.io/2017/05/02/How-to-insert-image-in-hexo-post/" target="_blank" rel="noopener" title="yanyinhong 的博客：Hexo博客搭建之在文章中插入图片">^1</a> 中提到了三种插入图片的方式，这三种不论是哪一种，都无法在本地实时预览，都需要在上传前修改本地图片的链接。第一种方法，把图片放入到<code>/source/images</code>文件夹中，在文件中<code>/images/image name</code>引用，可以在首页和文章观看。第二种方法，图片可以在文章出现，但不能在首页中出现。第三种方法，是 hexo 的插件语法，个人看法：这样破坏了 Markdown 文件的易读性。</p>
-<p>应用场景最全面第一种方法。要让插入到图片保存到<code>/source/images/</code>中，可以将 Typora 的保存图片规则设置为插入到<code>../images/</code>，然后解决第二问题，规则为<code>../images</code> 生成的 img 的 src 属性也是<code>../images</code> ，而我们需要的是<code>/images/image name</code>的形式，使用脚本修改生成标签的属性，将上文的 21~22 行修改如下。</p>
+<p>应用场景最全面第一种方法。要让插入到图片保存到<code>/source/images/</code>中，可以将 Typora 的保存图片规则设置为插入到<code>../images/</code>，然后解决第二问题，规则为<code>../images</code> 生成的 img 的 src 属性也是<code>../images</code> ，而我们需要的是<code>/images/image name</code>的形式，使用脚本修改生成标签的属性，将上文的修改链接部分的代码修改如下。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(src.slice(<span class="number">0</span>,<span class="number">8</span>) === <span class="string">'../images'</span>)&#123;</span><br><span class="line">    $(<span class="keyword">this</span>).attr(<span class="string">'src'</span>,src.slice(<span class="number">2</span>));</span><br></pre></td></tr></table></figure>
 <p>将上述操作完成后，在本地和云端都可以正常预览图片。然而将本地图片默认保存到上级目录并不符合一般人的习惯。并且 Typora 不能为文件夹单独配置图片插入规则。所以，通过软链接的方式将文章修改到本目录的 images。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>尽管操作步骤很多，对于新手也很容易出错。但是设置完成之后只需要按照平常的使用方法使用 Typora 就可以了。有点磨刀不误砍柴工的感觉。 <strong>hexo-asset-image</strong> 这个插件我在  <a href="http://etrd.org/" target="_blank" rel="noopener">ETRD</a> 中的博客看到的<a href="http://etrd.org/2017/01/23/hexo%E4%B8%AD%E5%AE%8C%E7%BE%8E%E6%8F%92%E5%85%A5%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87/" target="_blank" rel="noopener" title="ETRD的博客：hexo中完美插入本地图片">^2</a>。 笔者并没有学习过 hexo 的脚本或者插件开发，所以修改的代码可能有 Bug。也请在评论区中告诉我。预览效果请参考:<br><a href="https://rothleer.github.io/2019/11/21/测试文章/">https://rothleer.github.io/2019/11/21/%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0/</a> </p>
