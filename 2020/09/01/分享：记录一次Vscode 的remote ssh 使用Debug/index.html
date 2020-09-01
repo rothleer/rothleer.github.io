@@ -8,7 +8,7 @@
   
   
   
-  <title>归档: 2019/11 | Hexo</title>
+  <title>分享：记录一次Vscode 的remote ssh 使用Debug | Hexo</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -204,71 +204,126 @@
   })
 </script>
 
-      <div class="container">
-  <div class="timeline">
-  <span class="archive-move-on"></span>
-  <span class="archive-page-counter">
-    
-      <span>Wow! 一共有 5 篇文章</span>
-    
-  </span>
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
   
+
+<div class="post">
+  <h1 class="article-title">
+    <span>分享：记录一次Vscode 的remote ssh 使用Debug</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2020-09-01
+    </span>
+    
+    
+  </div>
+
   
-    <div class="collection-title">
-      <h2>
-        <span>2019</span>
-      </h2>
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h1 id="解决Visual-Studio-Code-的插件-Remote-SSH-无法访问问题"><a href="#解决Visual-Studio-Code-的插件-Remote-SSH-无法访问问题" class="headerlink" title="解决Visual Studio Code 的插件 Remote-SSH 无法访问问题"></a>解决Visual Studio Code 的插件 Remote-SSH 无法访问问题</h1><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>台式机在经历一次 windows 10 升级之后，处于笔记本端的 Visual Studio Code （简称：vscode）无法访问台式机。经过排查发现目标台式机的<code>%PATH%</code>中缺失了 <code>powershell</code>。在目标机器上将<code>powershell.exe</code>所在的路径加入<code>%PATH%</code> 则可以正常工作。</p>
+<h2 id="经历"><a href="#经历" class="headerlink" title="经历"></a>经历</h2><p>问题：windows 2004 更新之后，处在笔记本端的 vscode 无法访问处在台式端的 vscode。终端输出大量报错日志信息，报错的最后一行显示: “过程试图写入的管道不存在”。</p>
+<p>环境：但是采用 ssh 命令却可以访问目标机器。这里初步猜测是 Remote-SSH 扩展出现了问题，因此查阅问题。总的来说是：</p>
+<ol>
+<li>没有正确的配置ssh config</li>
+<li>know_hosts 不一致</li>
+<li>windows 自动更新后，会安装微软自己开发的 ssh 客户端，并且优先访问windows自己的 ssh 客户端。然而部分用户的 ssh 客户端没有写入本机的权限。</li>
+</ol>
+<blockquote>
+<p>从上述第三点可以看出windows 更新的策略的问题，会破坏用户原本的设置。</p>
+</blockquote>
+<p>在尝试上述解决方案之后，依然无法使用remote ssh 访问目标台式机。最后本人决定手动输入一遍，报错日志中提到的命令。</p>
+<p>命令是基于 powershell 的。登录 ssh 后，发现无法从 cmd 进入 powershell。于是尝试将powershell 的路径添加到 %PATH% 中，尝试用 remote-ssh 连接目标台式机成功。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>开始轻率的认为是本地客户端出问题了。导致排查的方向出问题，但是实际上，ssh 是可以正常访问目标机器只能意味着ssh 能正常使用并不意味着其他方面。在开始想当然的认为 vscode remote-ssh 的插件仅仅依赖ssh。若能提前了解 remote-ssh 的依赖可以更快的定位到问题。</p>
+<p>这个问题困扰了我有数月了，然而因为排查方向，空空的耗费许多时间。所谓选择大于努力就是这种体验吧</p>
+
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : Rothleer <br/>
+        
+        原文链接 : <a href="">https://rothleer.github.io/2020/09/01/%E5%88%86%E4%BA%AB%EF%BC%9A%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1Vscode%20%E7%9A%84remote%20ssh%20%E4%BD%BF%E7%94%A8Debug/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
     </div>
   
   
   
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2019/11/23/Android%20%E4%B8%8A%E7%9A%84%20Chrome%EF%BC%9AKiwi%20%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E8%B0%83%E6%95%B4%E5%92%8C%E6%8F%92%E4%BB%B6%E5%88%86%E4%BA%AB/">
-          <span>Android 上的 Chrome：Kiwi 浏览器的调整和插件分享</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        11-23
-      </div>
-    </header>
-  </article>
+    <div class="social-share"
+  style="margin-top: -2rem"
+  data-wechat-qrcode-title="<p>微信扫一扫</p>"
+  data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>"
+   data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter" 
   
-  
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2019/11/21/%E6%8F%90%E5%8D%87%20hexo%20%E7%9A%84%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5%E4%BD%93%E9%AA%8C/">
-          <span>提升 hexo 的图片插入体验</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        11-21
-      </div>
-    </header>
-  </article>
-  
-  
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2019/11/21/%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0/">
-          <span>测试文章</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        11-21
-      </div>
-    </header>
-  </article>
-  
+>
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
 </div>
-  <nav class="page-navigation">
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async>
+  
+
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
     
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/11/23/Android%20%E4%B8%8A%E7%9A%84%20Chrome%EF%BC%9AKiwi%20%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E8%B0%83%E6%95%B4%E5%92%8C%E6%8F%92%E4%BB%B6%E5%88%86%E4%BA%AB/" target="_self">Android 上的 Chrome：Kiwi 浏览器的调整和插件分享</a>
+      </div>
+    
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2020/09/01/%E5%AE%9E%E7%8E%B0%20networkx%20%E4%B8%AD%E6%B2%A1%E6%9C%89%E6%8F%90%E4%BE%9B%E7%9A%84%20Weight%20Clustering%20%E5%87%BD%E6%95%B0/" target="_self">实现 networkx 中没有提供的 Weight Clustering 函数</a>
+        <i class="iconfont icon-next"></i>
+      </div>
     
   </nav>
+
+   
+
+   
+
 </div>
+
 
       <footer>
   <p class="site-info">
