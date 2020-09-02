@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="Rothleer" />
+  
+  
+  
+  <title>用 Python的装饰器实现类似 Java 的注解 | Hexo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Hexo, theme-bmw" />
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+
+  
+
+  
+    <link rel="icon" href="/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">Rothleer Blog</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a 
+              href="/"
+              target="_self"
+            >
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a 
+              href="/archives/"
+              target="_self"
+            >
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/categories/">
+          
+            <a 
+              href="/categories/"
+              target="_self"
+            >
+              分类
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          
+            <a 
+              href="/tags/"
+              target="_self"
+            >
+              标签
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a 
+              href="/friends/"
+              target="_self"
+            >
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a 
+              href="/about/"
+              target="_self"
+            >
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="">
+          
+            <a href="javascript:void(0);" target="_blank" rel="noopener" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a 
+                    href="https://github.com/rothleer" 
+                    target="_blank"
+                  >
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a 
+                    href="https://www.zhihu.com/people/rothleer" 
+                    target="_blank"
+                  >
+                    知乎
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>用 Python的装饰器实现类似 Java 的注解</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2020-09-02
+    </span>
+    
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h1 id="用-Python的装饰器实现类似-Java-的注解"><a href="#用-Python的装饰器实现类似-Java-的注解" class="headerlink" title="用 Python的装饰器实现类似 Java 的注解"></a>用 Python的装饰器实现类似 Java 的注解</h1><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文基于 Python 的装饰器功能，实现 Python 中实现了类 Java 的注解。使得容器可以在运行时读取注解内包含的信息。且在使用上兼容 Java 的写法。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><h3 id="什么是装饰器？"><a href="#什么是装饰器？" class="headerlink" title="什么是装饰器？"></a>什么是装饰器？</h3><p>首先需要了解所谓的“装饰器”是什么？装饰器是一种语法糖，如下列代码所示，在函数上添加<code>@dec</code>相当于<code>func = dec(func)</code>，所以实际上只是。python 装饰器实现了23种设计模式之一的装饰器模式，在不修改原有函数的情况下，为函数添加功能。尽管 Java 注解从代码上看非常类似于装饰器，然而二者之间并没有什么联系。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dec</span><span class="params">(func)</span>:</span></span><br><span class="line">    print(func.__name__)</span><br><span class="line">    <span class="keyword">return</span> func</span><br><span class="line"></span><br><span class="line"><span class="comment"># 装饰器写法</span></span><br><span class="line"><span class="meta">@dec # &lt;=&gt; func = dec(func)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'func exec!'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 执行结果</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string"><span class="meta">&gt;&gt;&gt; </span>func()</span></span><br><span class="line"><span class="string">func</span></span><br><span class="line"><span class="string">func exec!</span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="什么是注解？"><a href="#什么是注解？" class="headerlink" title="什么是注解？"></a>什么是注解？</h3><p>Java 中的注解可以作用在类，方法，变量，参数上。注解会成为元数据[1]的一部分，容器可以通过读取元数据来操控程序。比如大名鼎鼎的spring也采用注解的功能实现IOC和AOP。</p>
+<h3 id="从装饰器到注解？"><a href="#从装饰器到注解？" class="headerlink" title="从装饰器到注解？"></a>从装饰器到注解？</h3><p>Python 的装饰器能修饰的范围并不如 Java 那么丰富，只能修饰方法，函数，类。Python 的解释器在导入函数的过程中会执行装饰器中的代码。而注解的作用是，为函数添加元数据。因此我们采用为所有对象添加<code>__meta__</code> 方法来保存需要的元数据。</p>
+<p>因此结合两者，采用通过执行装饰器的代码的时机，为函数添加元数据。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">anno</span><span class="params">(func)</span>:</span></span><br><span class="line">    func.__meta__ = &#123;<span class="string">'anno'</span>:<span class="literal">None</span>&#125;</span><br><span class="line">	<span class="keyword">return</span> func</span><br><span class="line"></span><br><span class="line"><span class="meta">@anno</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">()</span>:</span></span><br><span class="line">    print(‘func <span class="keyword">exec</span>’)</span><br></pre></td></tr></table></figure>
+
+<h3 id="编写注解"><a href="#编写注解" class="headerlink" title="编写注解"></a>编写注解</h3><p>在 Python 中并不存在接口，因此我们使用带默认参数的函数代替Java 中的@interface。如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">anno</span><span class="params">(foo=<span class="string">'f'</span>,bar=<span class="string">'b'</span>)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="实现不定参数，兼容Java语法"><a href="#实现不定参数，兼容Java语法" class="headerlink" title="实现不定参数，兼容Java语法"></a>实现不定参数，兼容Java语法</h3><p>由于装饰器的特性，<code>@anno</code> 并不等价于 <code>@anno()</code> ，但是我们希望装饰器能够实现 <code>@anno &lt;=&gt; @anno()</code>。使得注解兼容于 Java 的语法。</p>
+<p>这里可以利用 Python 不定参数。通过检测不定参数的长度，检查执行的对象是否为要装饰的函数。若是没有参数，则让对象返回自己。同理，可以应用 Python 的魔法方法来获取默认参数的名称以及值，来为元数据添加其他属性。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">anno</span><span class="params">(*args,**kwargs)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> len(args)==<span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> anno</span><br><span class="line">    <span class="keyword">elif</span> len(args)==<span class="number">1</span>:</span><br><span class="line">        func = args[<span class="number">0</span>] <span class="comment"># args[0] 即为需要添加元数据的函数。</span></span><br><span class="line">        func.__meta__ = &#123;<span class="string">'anno'</span>:<span class="literal">None</span>&#125;</span><br><span class="line">        <span class="keyword">return</span> func</span><br><span class="line"></span><br><span class="line"><span class="meta">@anno()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f1</span><span class="params">()</span>:</span><span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">print(f1.__meta__)</span><br><span class="line"><span class="comment">#&gt;&gt;&gt; &#123;'anno':None&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@anno</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f2</span><span class="params">()</span>:</span><span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">print(f2.__meta__)</span><br><span class="line"><span class="comment">#&gt;&gt;&gt; &#123;'anno':None&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="添加检查"><a href="#添加检查" class="headerlink" title="添加检查"></a>添加检查</h3><p>在 Java 中自定义注解可以指定修饰的对象，通过 type 函数来检测需要修饰的对象是否为指定对象。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">object_type = <span class="string">'function'</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">anno</span><span class="params">(func)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> type(func).__name__ != object_type:</span><br><span class="line">        <span class="keyword">raise</span> Exception(<span class="string">f'Type of <span class="subst">&#123;func.__name__&#125;</span> is not <span class="subst">&#123;object_type&#125;</span>'</span>)</span><br><span class="line">	<span class="keyword">return</span> func</span><br></pre></td></tr></table></figure>
+
+<h3 id="多个注解"><a href="#多个注解" class="headerlink" title="多个注解"></a>多个注解</h3><p>如上述代码，<code>__meta__</code> 对象本身是一个字典，因此多个装饰器之间添加属性并不会相互影响。而同个装饰器则会覆盖。</p>
+<h3 id="将上述功能融合到一个类中"><a href="#将上述功能融合到一个类中" class="headerlink" title="将上述功能融合到一个类中:"></a>将上述功能融合到一个类中:</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">target</span>:</span></span><br><span class="line">    TYPE_CLASS = <span class="string">'type'</span></span><br><span class="line">    TYPE_FUNCTION = <span class="string">'function'</span></span><br><span class="line">    TYPE_METHOD = <span class="string">'method'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, type)</span>:</span></span><br><span class="line">        self.type = type</span><br><span class="line">        self.temporary_stroage_params = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, target_annotation)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">            <span class="keyword">if</span> len(args) == <span class="number">1</span> <span class="keyword">and</span> len(kwargs) == <span class="number">0</span>:</span><br><span class="line">                obj = args[<span class="number">0</span>]</span><br><span class="line">                <span class="keyword">if</span> type(obj).__name__ != self.type:</span><br><span class="line">                    <span class="keyword">raise</span> Exception(<span class="string">'Anno target is Wrong!'</span>)</span><br><span class="line">                self.add_to_meta(obj, target_annotation)</span><br><span class="line">                <span class="keyword">return</span> obj</span><br><span class="line">            <span class="keyword">elif</span> len(args) == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">if</span> len(kwargs) != <span class="number">0</span>:</span><br><span class="line">                    self.temporary_stroage_params = kwargs</span><br><span class="line">                <span class="keyword">return</span> f</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">raise</span> Exception(<span class="string">''</span>)</span><br><span class="line">        <span class="keyword">return</span> f</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add_to_meta</span><span class="params">(self, obj, target_annotation)</span>:</span></span><br><span class="line">        ts_params = self.temporary_stroage_params  <span class="comment"># temporary_stroage_params</span></span><br><span class="line">        default_params_name = target_annotation.__code__.co_varnames</span><br><span class="line">        default_params_value = target_annotation.__defaults__</span><br><span class="line">        params = &#123;&#125;</span><br><span class="line">        anno = target_annotation.__name__</span><br><span class="line">        size = target_annotation.__code__.co_argcount</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(size):</span><br><span class="line">            param_name = default_params_name[i]</span><br><span class="line">            <span class="keyword">if</span> ts_params <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> param_name <span class="keyword">in</span> ts_params:</span><br><span class="line">                params[param_name] = ts_params[param_name]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                params[param_name] = default_params_value[i]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> hasattr(obj, <span class="string">'__meta__'</span>):</span><br><span class="line">            obj.__meta__[anno] = params</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            obj.__meta__ = &#123;anno: params&#125;</span><br><span class="line">        self.temporary_stroage_params = <span class="literal">None</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">@target(type=target.TYPE_FUNCTION)</span><br><span class="line">def anno1(foo=&apos;f&apos;, bar=&apos;b&apos;):</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@target(type=target.TYPE_FUNCTION)</span><br><span class="line">def anno2():</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@target(type=target.TYPE_FUNCTION)</span><br><span class="line">def anno3(foo=&apos;f&apos;, bar=&apos;b&apos;):</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@anno1</span><br><span class="line">@anno2()</span><br><span class="line">@anno3(foo=&apos;zhiding&apos;)</span><br><span class="line">def func():</span><br><span class="line">    print(&apos;exec&apos;)</span><br><span class="line"></span><br><span class="line">print(func.__meta__)</span><br><span class="line">#&gt;&gt;&gt; &#123;&apos;anno3&apos;: &#123;&apos;foo&apos;: &apos;zhiding&apos;, &apos;bar&apos;: &apos;b&apos;&#125;, &apos;anno2&apos;: &#123;&#125;, &apos;anno1&apos;: &#123;&apos;foo&apos;: &apos;f&apos;, &apos;bar&apos;: &apos;b&apos;&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序可以正常执行。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文的程序在实现和 Java 的注解相似的部分的情况下，将 <code>__meta__</code> 注入到需要装饰的对象。<code>__meta__</code>可以在运行时被容器或者其他程序读取。为IOC和AOP提供了一种实现方式。</p>
+
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : Rothleer <br/>
+        
+        原文链接 : <a href="">https://rothleer.github.io/2020/09/02/%E7%94%A8%20Python%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8%E5%AE%9E%E7%8E%B0%E7%B1%BB%E4%BC%BC%20Java%20%E7%9A%84%E6%B3%A8%E8%A7%A3/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share"
+  style="margin-top: -2rem"
+  data-wechat-qrcode-title="<p>微信扫一扫</p>"
+  data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>"
+   data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter" 
+  
+>
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async>
+  
+
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2020/09/01/%E5%AE%9E%E7%8E%B0%20networkx%20%E4%B8%AD%E6%B2%A1%E6%9C%89%E6%8F%90%E4%BE%9B%E7%9A%84%20Weight%20Clustering%20%E5%87%BD%E6%95%B0/" target="_self">实现 networkx 中没有提供的 Weight Clustering 函数</a>
+      </div>
+    
+    
+  </nav>
+
+   
+
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw" target="_blank" rel="noopener">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/" target="_blank" rel="noopener">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>
