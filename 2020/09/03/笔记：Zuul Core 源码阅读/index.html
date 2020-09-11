@@ -8,7 +8,7 @@
   
   
   
-  <title>归档 | Hexo</title>
+  <title>笔记：Zuul Core 源码阅读 | Hexo</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -204,147 +204,140 @@
   })
 </script>
 
-      <div class="container">
-  <div class="timeline">
-  <span class="archive-move-on"></span>
-  <span class="archive-page-counter">
-    
-      <span>Wow! 一共有 8 篇文章</span>
-    
-  </span>
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
   
+
+<div class="post">
+  <h1 class="article-title">
+    <span>笔记：Zuul Core 源码阅读</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2020-09-03
+    </span>
+    
+    
+  </div>
+
   
-    <div class="collection-title">
-      <h2>
-        <span>2020</span>
-      </h2>
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h1 id="笔记：Zuul-Core-源码阅读"><a href="#笔记：Zuul-Core-源码阅读" class="headerlink" title="笔记：Zuul Core 源码阅读"></a>笔记：Zuul Core 源码阅读</h1><h2 id="架构图"><a href="#架构图" class="headerlink" title="架构图"></a>架构图</h2><p><img src="https://gitee.com/rothleer/note-image/raw/master/img/Zuul.svg" alt></p>
+<h2 id="流程的解析"><a href="#流程的解析" class="headerlink" title="流程的解析"></a>流程的解析</h2><h3 id="全局的入口-ZuulServlet"><a href="#全局的入口-ZuulServlet" class="headerlink" title="全局的入口 ZuulServlet"></a>全局的入口 ZuulServlet</h3><ul>
+<li><p>Zuul 只有一个全局的 servlet 因此对于所有发送到Zuul 的请求都将会由这个 servlet 解析。我们知道每个servlet 只会实例化一次，每次请求都会调用 ZuulServlet 的 service 方法。</p>
+</li>
+<li><p>ZuulServlet 内部的 ZuulRunner 并不是静态变量，但是正如上面提到的。servlet 变量只有一个因此，并不需要反复的初始化 servlet。本质上 ZuulRunner 对于 Zuul 网关来说也是单例的。</p>
+</li>
+</ul>
+<h3 id="过滤器链-与-异常处理"><a href="#过滤器链-与-异常处理" class="headerlink" title="过滤器链 与 异常处理"></a>过滤器链 与 异常处理</h3><ul>
+<li><p>ZuulServlet 内部会调用 ZuulRunnner.pre() ZuulRunner.route() ZuulRunnner.post() 并以TRY CATCH 的形式完成 pre-route-post 或者在有异常的情况下存在，实现 pre-error-post ，pre-route-err-post ，pre-route-post-error 的形式。</p>
+</li>
+<li><p>注意到采用finally的设计，即使不同的线程service存在问题，也可以在最后把 RequestContext 移除。</p>
+</li>
+<li><p>若代码抛出 ZuulException 代表代码中产生的异常是可以捕获且可以处理的。而如果是其他异常直接捕获 throwable 类，保证不会因为一个线程的问题影响到整个系统。</p>
+</li>
+<li><p>过滤器链条实现了责任链模式，通过不同的过滤器链条来实现。且通过一个基于 ThreadLocal 中存储 RequestContext Map 这样一个数据结构完成不同的过滤器链条的设计。可以看出不同的过滤器链条在设计上并不耦合增加了可扩展性。但是让代码不容易阅读。</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">            init((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);</span><br><span class="line">            RequestContext context = RequestContext.getCurrentContext();</span><br><span class="line">            context.setZuulEngineRan();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                preRoute();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ZuulException e) &#123;</span><br><span class="line">                error(e);</span><br><span class="line">                postRoute();</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                route();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ZuulException e) &#123;</span><br><span class="line">                error(e);</span><br><span class="line">                postRoute();</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                postRoute();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ZuulException e) &#123;</span><br><span class="line">                error(e);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">            error(<span class="keyword">new</span> ZuulException(e, <span class="number">500</span>, <span class="string">"UNHANDLED_EXCEPTION_"</span> + e.getClass().getName()));</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            RequestContext.getCurrentContext().unset();</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="RequestContext"><a href="#RequestContext" class="headerlink" title="RequestContext"></a>RequestContext</h3><ol>
+<li><p>RequestContext 继承了 ConcurrentHashMap。RequestContext 重写了 ThreadLocal 的initialValue 方法，在调用use时自动的完成了初始化。</p>
+</li>
+<li><p>RequestContext 采用 getCurrentContext 方法去获取当前线程存储的 ThreadLocal的 RequestContext。</p>
+</li>
+<li><p>这里有个问题，RequestContext既然已经是ThreadLocal 了。意味着本身这个RequestContext 就是线程安全的。所以问为什么需要继承 ConcurrentHashMap 呢？</p>
+</li>
+</ol>
+
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : Rothleer <br/>
+        
+        原文链接 : <a href="">https://rothleer.github.io/2020/09/03/%E7%AC%94%E8%AE%B0%EF%BC%9AZuul%20Core%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
     </div>
   
   
   
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2020/09/11/Http2.0%20%E7%AC%94%E8%AE%B0%EF%BC%9A%E5%A4%9A%E5%BF%AB%E5%A5%BD%E7%9C%81/">
-          <span>Http2.0 笔记：多快好省</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        09-11
-      </div>
-    </header>
-  </article>
+    <div class="social-share"
+  style="margin-top: -2rem"
+  data-wechat-qrcode-title="<p>微信扫一扫</p>"
+  data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>"
+   data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter" 
   
-  
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2020/09/03/%E7%AC%94%E8%AE%B0%EF%BC%9AZuul%20Core%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/">
-          <span>笔记：Zuul Core 源码阅读</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        09-03
-      </div>
-    </header>
-  </article>
-  
-  
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2020/09/02/%E7%94%A8%20Python%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8%E5%AE%9E%E7%8E%B0%E7%B1%BB%E4%BC%BC%20Java%20%E7%9A%84%E6%B3%A8%E8%A7%A3/">
-          <span>用 Python的装饰器实现类似 Java 的注解</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        09-02
-      </div>
-    </header>
-  </article>
-  
-  
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2020/09/01/%E5%AE%9E%E7%8E%B0%20networkx%20%E4%B8%AD%E6%B2%A1%E6%9C%89%E6%8F%90%E4%BE%9B%E7%9A%84%20Weight%20Clustering%20%E5%87%BD%E6%95%B0/">
-          <span>实现 networkx 中没有提供的 Weight Clustering 函数</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        09-01
-      </div>
-    </header>
-  </article>
-  
-  
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2020/09/01/%E5%88%86%E4%BA%AB%EF%BC%9A%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1Vscode%20%E7%9A%84remote%20ssh%20%E4%BD%BF%E7%94%A8Debug/">
-          <span>分享：记录一次Vscode 的remote ssh 使用Debug</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        09-01
-      </div>
-    </header>
-  </article>
-  
-  
-    <div class="collection-title">
-      <h2>
-        <span>2019</span>
-      </h2>
-    </div>
-  
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2019/11/23/Android%20%E4%B8%8A%E7%9A%84%20Chrome%EF%BC%9AKiwi%20%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E8%B0%83%E6%95%B4%E5%92%8C%E6%8F%92%E4%BB%B6%E5%88%86%E4%BA%AB/">
-          <span>Android 上的 Chrome：Kiwi 浏览器的调整和插件分享</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        11-23
-      </div>
-    </header>
-  </article>
-  
-  
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2019/11/21/%E6%8F%90%E5%8D%87%20hexo%20%E7%9A%84%E5%9B%BE%E7%89%87%E6%8F%92%E5%85%A5%E4%BD%93%E9%AA%8C/">
-          <span>提升 hexo 的图片插入体验</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        11-21
-      </div>
-    </header>
-  </article>
-  
-  
-  <article class="posts-collapse">
-    <header>
-      <h2>
-        <a href="/2019/11/21/%E6%B5%8B%E8%AF%95%E6%96%87%E7%AB%A0/">
-          <span>测试文章</span>
-        </a>
-      </h2>
-      <div class="post-meta">
-        11-21
-      </div>
-    </header>
-  </article>
-  
+>
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
 </div>
-  <nav class="page-navigation">
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async>
+  
+
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
     
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2020/09/02/%E7%94%A8%20Python%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8%E5%AE%9E%E7%8E%B0%E7%B1%BB%E4%BC%BC%20Java%20%E7%9A%84%E6%B3%A8%E8%A7%A3/" target="_self">用 Python的装饰器实现类似 Java 的注解</a>
+      </div>
+    
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2020/09/11/Http2.0%20%E7%AC%94%E8%AE%B0%EF%BC%9A%E5%A4%9A%E5%BF%AB%E5%A5%BD%E7%9C%81/" target="_self">Http2.0 笔记：多快好省</a>
+        <i class="iconfont icon-next"></i>
+      </div>
     
   </nav>
+
+   
+
+   
+
 </div>
+
 
       <footer>
   <p class="site-info">
