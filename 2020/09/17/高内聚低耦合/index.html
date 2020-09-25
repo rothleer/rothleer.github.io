@@ -8,7 +8,7 @@
   
   
   
-  <title>Http2.0 笔记：多快好省 | Hexo</title>
+  <title>高内聚低耦合 | Hexo</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -219,12 +219,12 @@
 
 <div class="post">
   <h1 class="article-title">
-    <span>Http2.0 笔记：多快好省</span>
+    <span>高内聚低耦合</span>
   </h1>
   <div class="article-top-meta">
     <span>
       发布 : 
-      2020-09-11
+      2020-09-17
     </span>
     
     
@@ -234,24 +234,7 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <h1 id="Http-2-0-笔记多快好省"><a href="#Http-2-0-笔记多快好省" class="headerlink" title="Http 2.0 笔记多快好省"></a>Http 2.0 笔记多快好省</h1><p>我用周总理的话来总结一下，“多快好省”和下面这张图来方便记忆。</p>
-<p><img src="https://gitee.com/rothleer/note-image/raw/master/img/image-20200911172101503.png" alt="image-20200911172101503"></p>
-<h2 id="核心二进制分帧"><a href="#核心二进制分帧" class="headerlink" title="核心二进制分帧"></a>核心二进制分帧</h2><p>在 Http1.1 的基础上加入了一个二进制帧层面。</p>
-<ul>
-<li>在 http1.0 时代一个资源就一个 http 链接，这样太浪费TCP链接了，比如说一个网页上有两三图片。</li>
-<li>因此到了http1.1 时代规定每次完成请求后tcp链接会多保存一会儿。这样在加载多个图片的时候可以复用一个tcp。这样就可以复用多个图片了。</li>
-<li>http1.1 依然有问题，我得先加载第一个图片，才能再发起加载第二个图片的请求。为什么不能同时加载这两个资源呢？</li>
-<li>因此到了http2.0的时代，我们需要在一个tcp上需要有额外的东西来表示这个资源属于哪个图片。就是帧头部，每个帧都有自己独立的帧头部。帧作为运输的最小单元。进行运输。帧头部便可以包含许多信息。比方说我这个帧他属于哪个资源，或者说那个流？也可以包含这个帧是不是要被尽快的处理。</li>
-</ul>
-<h2 id="二进制分帧和TCP概念以及实现的功能"><a href="#二进制分帧和TCP概念以及实现的功能" class="headerlink" title="二进制分帧和TCP概念以及实现的功能"></a>二进制分帧和TCP概念以及实现的功能</h2><p>从这里我们感受到了http2.0 和tcp的设计很相似。基于二进制的帧，可以模仿实现TCP中已经存在许多功能。</p>
-<ul>
-<li>资源优先级：TCP的报文头部中URG标志位。而帧头部中同样存在这个。实现资源的优先控制。</li>
-<li>流量控制：报文中可以交代那个资源不需要这么快的发送过来。</li>
-<li>服务器推送：基于流的协议可以实现主动的推送。</li>
-<li>多路复用：同一个tcp上实现不同数据的多段传输。因此实现了多路复用功能。</li>
-</ul>
-<h2 id="首部压缩"><a href="#首部压缩" class="headerlink" title="首部压缩"></a>首部压缩</h2><p>首部中有什么 method:get 这样的字符，这样的字符非常冗余，因为每次都要传，积累起来浪费的流量可以说就成千上万了。我们可以适当的用压缩技术来将这些字符压缩一下。这样就节省了首部的流量。关于首部压缩具体的文章可以参考：<a href="https://segmentfault.com/a/1190000017011816。" target="_blank" rel="noopener">https://segmentfault.com/a/1190000017011816。</a></p>
-
+      
     </div>
   </div>
   
@@ -262,7 +245,7 @@
         
           本文作者 : Rothleer <br/>
         
-        原文链接 : <a href="">https://rothleer.github.io/2020/09/11/Http2.0%20%E7%AC%94%E8%AE%B0%EF%BC%9A%E5%A4%9A%E5%BF%AB%E5%A5%BD%E7%9C%81/</a><br>
+        原文链接 : <a href="">https://rothleer.github.io/2020/09/17/%E9%AB%98%E5%86%85%E8%81%9A%E4%BD%8E%E8%80%A6%E5%90%88/</a><br>
         版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
         </blockquote>
       </div>
@@ -308,15 +291,9 @@
       <div class="nav-pre">
         <i class="iconfont icon-prev"></i>
         上一篇:
-        <a href="/2020/09/03/%E7%AC%94%E8%AE%B0%EF%BC%9AZuul%20Core%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" target="_self">笔记：Zuul Core 源码阅读</a>
-      </div>
-    
-    
-      <div class="nav-next">
-        下一篇:
         <a href="/2020/09/17/CAP%20%E5%92%8C%20BASE%20%E7%90%86%E8%AE%BA%E7%AC%94%E8%AE%B0/" target="_self">CAP 和 BASE 理论笔记</a>
-        <i class="iconfont icon-next"></i>
       </div>
+    
     
   </nav>
 

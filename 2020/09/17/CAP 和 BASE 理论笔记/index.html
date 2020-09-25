@@ -8,7 +8,7 @@
   
   
   
-  <title>Http2.0 笔记：多快好省 | Hexo</title>
+  <title>CAP 和 BASE 理论笔记 | Hexo</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -219,12 +219,12 @@
 
 <div class="post">
   <h1 class="article-title">
-    <span>Http2.0 笔记：多快好省</span>
+    <span>CAP 和 BASE 理论笔记</span>
   </h1>
   <div class="article-top-meta">
     <span>
       发布 : 
-      2020-09-11
+      2020-09-17
     </span>
     
     
@@ -234,24 +234,58 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <h1 id="Http-2-0-笔记多快好省"><a href="#Http-2-0-笔记多快好省" class="headerlink" title="Http 2.0 笔记多快好省"></a>Http 2.0 笔记多快好省</h1><p>我用周总理的话来总结一下，“多快好省”和下面这张图来方便记忆。</p>
-<p><img src="https://gitee.com/rothleer/note-image/raw/master/img/image-20200911172101503.png" alt="image-20200911172101503"></p>
-<h2 id="核心二进制分帧"><a href="#核心二进制分帧" class="headerlink" title="核心二进制分帧"></a>核心二进制分帧</h2><p>在 Http1.1 的基础上加入了一个二进制帧层面。</p>
+      <h1 id="CAP原理和BASE理论笔记"><a href="#CAP原理和BASE理论笔记" class="headerlink" title="CAP原理和BASE理论笔记"></a>CAP原理和BASE理论笔记</h1><h2 id="CAP-原理"><a href="#CAP-原理" class="headerlink" title="CAP 原理"></a>CAP 原理</h2><h3 id="CAP-是什么？"><a href="#CAP-是什么？" class="headerlink" title="CAP 是什么？"></a>CAP 是什么？</h3><p>CAP 三个字母对应着三个属性，分别是：</p>
 <ul>
-<li>在 http1.0 时代一个资源就一个 http 链接，这样太浪费TCP链接了，比如说一个网页上有两三图片。</li>
-<li>因此到了http1.1 时代规定每次完成请求后tcp链接会多保存一会儿。这样在加载多个图片的时候可以复用一个tcp。这样就可以复用多个图片了。</li>
-<li>http1.1 依然有问题，我得先加载第一个图片，才能再发起加载第二个图片的请求。为什么不能同时加载这两个资源呢？</li>
-<li>因此到了http2.0的时代，我们需要在一个tcp上需要有额外的东西来表示这个资源属于哪个图片。就是帧头部，每个帧都有自己独立的帧头部。帧作为运输的最小单元。进行运输。帧头部便可以包含许多信息。比方说我这个帧他属于哪个资源，或者说那个流？也可以包含这个帧是不是要被尽快的处理。</li>
+<li>C:Consistency 一致性</li>
+<li>A:Availability 可用性</li>
+<li>P:Partition tolerance 分区容错性</li>
 </ul>
-<h2 id="二进制分帧和TCP概念以及实现的功能"><a href="#二进制分帧和TCP概念以及实现的功能" class="headerlink" title="二进制分帧和TCP概念以及实现的功能"></a>二进制分帧和TCP概念以及实现的功能</h2><p>从这里我们感受到了http2.0 和tcp的设计很相似。基于二进制的帧，可以模仿实现TCP中已经存在许多功能。</p>
+<h3 id="CAP-原理又是什么？"><a href="#CAP-原理又是什么？" class="headerlink" title="CAP 原理又是什么？"></a>CAP 原理又是什么？</h3><p>CAP 原理，注意多了原理两个字，代表着上述3点，一个分布式系统最多只能同时做到两点，而没办法同时做到三点。</p>
+<h3 id="CAP-内容"><a href="#CAP-内容" class="headerlink" title="CAP 内容"></a>CAP 内容</h3><h4 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h4><ul>
+<li>强一致性，也称为原子一致性。任何时间下，所有节点的数据是一样的。举个例子，分布式数据库的串行化。比如说对<strong>订单</strong>的管理和生成。为了方便记忆，可以说的上是原子一致性。</li>
+<li>弱一致性，并不要求实时的提供一致性，。比如说论坛的<strong>点赞</strong>，赞的数量错误，也并不会有太大的影响。<ul>
+<li>最终一致性，经过一段时间之后，可以访问到更新后的数据。</li>
+</ul>
+</li>
+</ul>
+<h4 id="可用性"><a href="#可用性" class="headerlink" title="可用性"></a>可用性</h4><p>能否良好的为用户进行服务。</p>
+<h4 id="分区容错性"><a href="#分区容错性" class="headerlink" title="分区容错性"></a>分区容错性</h4><p>分布式系统在遇得到节点或者网络分区故障的时候，仍然能够对外提供满足一致性或者可用性服务。</p>
+<h3 id="CAP-定理证明"><a href="#CAP-定理证明" class="headerlink" title="CAP 定理证明"></a>CAP 定理证明</h3><p>人们总是说分布式系统难以满足CAP三个条件，这样说法并不直观，因为很少提到设计思路，分布式系统中可能出现机器问题。考虑发生<strong>服务器连通的错误</strong>的状态下，CAP难以同时满足。</p>
+<h4 id="故障和CAP"><a href="#故障和CAP" class="headerlink" title="故障和CAP"></a>故障和CAP</h4><p><img src="https://gitee.com/rothleer/note-image/raw/master/img/image-20200918162636239.png" alt="image-20200918162636239"></p>
+<p>假如 Server A 和 B 之间无法连通，当 Client A 更新Server A数据的时候。有下列几种考虑方式。</p>
+<ol>
+<li><p>满足一致性分区容错性，禁止 Client A更新数据。但是这样会牺牲可用性。</p>
+</li>
+<li><p>满足可用性分区容错性，允许 Client A更新数据。但是这样会牺牲一致性。</p>
+</li>
+<li><p>满足可用性和一致性，让Server A 和 Server B的数据相互独立。但是牺牲了分区容错性，也就是A，B之间不交互数据。换句话说只要没有分区容错性，就不是一个分布式系统。</p>
+<blockquote>
+<p>是不是叫CP&amp;AP不兼容定理，会更好一些。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="CAP理论的样例分析"><a href="#CAP理论的样例分析" class="headerlink" title="CAP理论的样例分析"></a>CAP理论的样例分析</h2><h3 id="基于-CP-一致性容错性的设计"><a href="#基于-CP-一致性容错性的设计" class="headerlink" title="基于 CP 一致性容错性的设计"></a>基于 CP 一致性容错性的设计</h3><ul>
+<li>Zookeeper 如果 master 挂掉，那么就不会在重新选举期间不提供服务，换言之重新选举期间会放弃可用性。</li>
+</ul>
+<h3 id="基于-AP-可用性容错性的设计"><a href="#基于-AP-可用性容错性的设计" class="headerlink" title="基于 AP 可用性容错性的设计"></a>基于 AP 可用性容错性的设计</h3><ul>
+<li>Eureka 所有节点之间是平等的。换言之任意节点存储的数据相同。若节点挂掉会自动切换到新节点。换言之，实际上最大限度了保证了可用性。Eureka 诸如注册网关这样的功能。</li>
+</ul>
+<h2 id="BASE-理论"><a href="#BASE-理论" class="headerlink" title="BASE 理论"></a>BASE 理论</h2><p>BASE是下列三个单词的缩写，是互联网的实践。</p>
 <ul>
-<li>资源优先级：TCP的报文头部中URG标志位。而帧头部中同样存在这个。实现资源的优先控制。</li>
-<li>流量控制：报文中可以交代那个资源不需要这么快的发送过来。</li>
-<li>服务器推送：基于流的协议可以实现主动的推送。</li>
-<li>多路复用：同一个tcp上实现不同数据的多段传输。因此实现了多路复用功能。</li>
+<li>Basically Available（基本可用）</li>
+<li>Soft-state（软状态）</li>
+<li>Eventually Consistent（最终一致性） </li>
 </ul>
-<h2 id="首部压缩"><a href="#首部压缩" class="headerlink" title="首部压缩"></a>首部压缩</h2><p>首部中有什么 method:get 这样的字符，这样的字符非常冗余，因为每次都要传，积累起来浪费的流量可以说就成千上万了。我们可以适当的用压缩技术来将这些字符压缩一下。这样就节省了首部的流量。关于首部压缩具体的文章可以参考：<a href="https://segmentfault.com/a/1190000017011816。" target="_blank" rel="noopener">https://segmentfault.com/a/1190000017011816。</a></p>
-
+<p>与CAP不同的是，BASE 理论强调的是可以达到的状态。换言之，在可用上保证基本可用，利用软状态来达到最终一致性。</p>
+<blockquote>
+<p>例：论坛中利用 Redis 来记录点赞数，然后将点赞的消息发送到kafka中，最后记录到MySQL中谁点过谁的赞。</p>
+<ul>
+<li>基本可用：用Redis来存储已经点过赞了。</li>
+<li>软状态：利用Redis和Kafka来存储中间的装填。</li>
+</ul>
+<p>最终一致性：被写入数据库。之后在人搜索历史数据的时候保证不会有问题。</p>
+</blockquote>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2>
     </div>
   </div>
   
@@ -262,7 +296,7 @@
         
           本文作者 : Rothleer <br/>
         
-        原文链接 : <a href="">https://rothleer.github.io/2020/09/11/Http2.0%20%E7%AC%94%E8%AE%B0%EF%BC%9A%E5%A4%9A%E5%BF%AB%E5%A5%BD%E7%9C%81/</a><br>
+        原文链接 : <a href="">https://rothleer.github.io/2020/09/17/CAP%20%E5%92%8C%20BASE%20%E7%90%86%E8%AE%BA%E7%AC%94%E8%AE%B0/</a><br>
         版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
         </blockquote>
       </div>
@@ -308,13 +342,13 @@
       <div class="nav-pre">
         <i class="iconfont icon-prev"></i>
         上一篇:
-        <a href="/2020/09/03/%E7%AC%94%E8%AE%B0%EF%BC%9AZuul%20Core%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" target="_self">笔记：Zuul Core 源码阅读</a>
+        <a href="/2020/09/11/Http2.0%20%E7%AC%94%E8%AE%B0%EF%BC%9A%E5%A4%9A%E5%BF%AB%E5%A5%BD%E7%9C%81/" target="_self">Http2.0 笔记：多快好省</a>
       </div>
     
     
       <div class="nav-next">
         下一篇:
-        <a href="/2020/09/17/CAP%20%E5%92%8C%20BASE%20%E7%90%86%E8%AE%BA%E7%AC%94%E8%AE%B0/" target="_self">CAP 和 BASE 理论笔记</a>
+        <a href="/2020/09/17/%E9%AB%98%E5%86%85%E8%81%9A%E4%BD%8E%E8%80%A6%E5%90%88/" target="_self">高内聚低耦合</a>
         <i class="iconfont icon-next"></i>
       </div>
     
